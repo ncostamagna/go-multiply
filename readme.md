@@ -1,12 +1,14 @@
 Concurrency is about MANAGING multiple task at once, parallelism is about EXECUTING multiple tasks at once
 
-## Concurrency
-Program that can handler multiple task.
-Performing many tasks in a single CPU Core, create the illusion that tasks are progressing simultaneously, but really not
+# Concurrency
 
-## Parallelism
-Simultaniean executions.
-Multiple task can be processed simultained, using multiples CPU cores.
+- Program that can handler multiple task.
+- Performing many tasks in a single CPU Core, create the illusion that tasks are progressing simultaneously, but really not
+
+# Parallelism
+
+- Simultaniean executions.
+- Multiple task can be processed simultained, using multiples CPU cores.
 
 ## Capacity
 ```go 
