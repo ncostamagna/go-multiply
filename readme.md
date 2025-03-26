@@ -55,6 +55,86 @@ It's a pattern commonly used in parallel processing, like in divide-and-conquer 
 - **Fork-Join model** is the recipe  
 - **Fork-Join pool** is the kitchen appliance that makes it easier to cook that recipe
 
+# Communicating Sequential Processes - CSP
+It’s a formal way to describe how independent processes (tasks) communicate and coordinate with each other through channels.
+
+- Each process runs sequentially (like a regular function).
+
+- Processes don’t share memory.
+
+- Instead, they communicate by sending messages through channels.
+
+- Synchronization happens when one process sends a message and another receives it — they must "meet" at the channel.
+
+```go
+ch := make(chan string)
+
+go func() {
+    ch <- "hello" // sends data
+}()
+
+msg := <-ch // receives data
+fmt.Println(msg)
+
+// No shared memory.
+
+// Communication is synchronized at the channel.
+
+// If the receiver isn’t ready, the sender blocks, and vice versa.
+```
+
+2 main concepts: Synchronnization and Guarded Commands
+
+## Synchronization
+Synchronization means making sure that multiple threads or processes don’t step on each other’s toes — especially when accessing shared resources like variables or memory.
+
+Why do we need it?
+To avoid data races, inconsistencies, crashes, etc.
+
+### Common synchronization tools:
+- Locks / mutexes: Only one thread can access a resource at a time.
+
+- Semaphores: Counted locks, controlling access to a pool of resources.
+
+- Barriers: Threads wait until all reach a point.
+
+- Channels (in CSP): Implicit synchronization through communication.
+
+```go
+let counter = Arc::new(Mutex::new(0));
+
+let handle = thread::spawn({
+    let counter = Arc::clone(&counter);
+    move || {
+        let mut num = counter.lock().unwrap(); // synchronized access
+        *num += 1;
+    }
+});
+```
+
+## Guarded Commands
+Used to control the execution flow in concurrent or non-deterministic programs.
+A guard is a boolean condition (true or false) that controls whether a certain block of code can execute.
+
+In CSP, you can model programs that wait on multiple possible inputs, and choose based on availability. For example:
+
+```go
+select {
+case msg := <-ch1:
+    // do something with msg
+case msg := <-ch2:
+    // do something else
+}
+```
+
+This Go select statement is very much like guarded commands — each channel read is a guard, and only one case executes depending on which channel is ready.
+
+- Each case waits only if the channel is ready.
+
+- If multiple channels are ready, Go picks one at random → non-determinism.
+
+- If no guards are true (no channels ready), the default acts like a "fallback guard". If we have a default
+
 # Pool
 
 sync.Pool in Go is a structure for efficiently reusing objects and reducing the overhead of repeatedly creating and destroying them.
