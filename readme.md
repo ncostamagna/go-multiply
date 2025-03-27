@@ -41,15 +41,9 @@ This is why we can pass channels between functions, dont need to pass **pointers
 <img src="images/005.png" />
 <br />
 (user-space threads) Goroutines are created and managed by the Go runtime, NOT the OS (os threads)
+
 - user-space threads is less expensive with respecto to resource consumption and scheduling
 - the runtime scheduler schedules them onto OS threads
-<img src="images/006.png" />
-<br />
-<img src="images/007.png" />
-<br />
-<img src="images/008.png" />
-<br />
-<img src="images/009.png" />
 
 ## Capacity
 ```go 
@@ -60,6 +54,73 @@ affter the channel is closed we cant send anyrhing to the channel but we can rec
 
 
 https://www.youtube.com/watch?v=RlM9AfWf1WU&ab_channel=ByteByteGo
+
+# Runtime Scheduler
+The Go runtime manages goroutines using a M:N scheduler, meaning that M goroutines are scheduled onto N OS threads. This allows Go to run a huge number of goroutines efficiently, compared to using OS threads directly.
+
+- M (Goroutines) → N (Threads) → CPU Cores
+Go schedules many goroutines on fewer OS threads, which are mapped to CPU co
+
+The scheduler is designed to:
+
+- Minimize context switching.
+- Distribute goroutines across available CPU cores.
+- Avoid blocking OS threads whenever possible.
+
+<img src="images/006.png" />
+<br />
+<img src="images/007.png" />
+<br />
+<img src="images/008.png" />
+<br />
+<img src="images/009.png" />
+
+## Key Components of Go’s Scheduler
+Go’s scheduler consists of three main components:
+
+- G (Goroutine): A lightweight thread managed by Go.
+- M (Machine): Represents an OS thread.
+- P (Processor): Manages a set of goroutines and is assigned to an OS thread (M).
+
+### How They Work Together
+
+- Each P (Processor) runs a queue of goroutines.
+- M (Threads) execute goroutines from P.
+- When a goroutine blocks (e.g., waiting for I/O), the scheduler moves other goroutines to another available P.
+    - each OS thread (M) is assigned exactly one processor (P) at a time, but there can be more processors than threads.
+    - 1 M (OS thread) → 1 P (Processor) (An OS thread always runs under a processor)
+    - M (Threads) ≥ P (Processors) (There can be more OS threads than processors)
+    - Siempre hay exactamente 1 P por cada M en ejecución activa.
+    - Puede haber más M que P porque algunos M pueden estar bloqueados.
+    - Go crea más M cuando hay bloqueos, para seguir ejecutando otros goroutines.
+- The GOMAXPROCS setting controls the number of P (and thus how many CPU cores are used).
+
+### 2️⃣ ¿Por qué puede haber más M que P?
+
+Hay situaciones en las que Go necesita crear más **M** (OS threads) aunque no tenga suficientes **P** disponibles.
+
+**🔹 Caso 1: Bloqueo por llamadas al sistema**
+<br />
+Si un goroutine dentro de un **M** (OS thread) llama a una operación **bloqueante**, como:
+
+- **I/O** (leer un archivo, una red, una base de datos)
+- **Syscalls largas** (esperar entrada de usuario, un mutex del sistema, etc.)
+
+Entonces:
+
+1. Ese **M** se bloquea.
+2. Su **P** queda libre y se reasigna a otro **M**.
+3. Si no hay suficientes **M** activos para ejecutar otros goroutines, **Go crea un nuevo M**.
+
+➡️ **Ahora hay más M que P, porque hay M bloqueados esperando a que su syscall termine.**
+
+**🔹 Caso 2: Goroutines que usan Cgo**<br />
+Si un goroutine llama a una función en **C** (usando Cgo):
+
+1. El código **C** bloquea el thread (**M**), pero no devuelve el control al scheduler de Go.
+2. **Go crea otro M** para seguir ejecutando otros goroutines.
+
+➡️ **De nuevo, más M que P.**
 
 # Fork-Join Model
 
