@@ -33,6 +33,23 @@ ch := make(chan Tash, 3)
 ch := make(chan int)
 ```
 
+The channels are stored in the heap, returns a pointer to it.<br />
+This is why we can pass channels between functions, dont need to pass **pointers to channels**
+
+<img src="images/004.png" />
+<br />
+<img src="images/005.png" />
+<br />
+(user-space threads) Goroutines are created and managed by the Go runtime, NOT the OS (os threads)
+- user-space threads is less expensive with respecto to resource consumption and scheduling
+- the runtime scheduler schedules them onto OS threads
+<img src="images/006.png" />
+<br />
+<img src="images/007.png" />
+<br />
+<img src="images/008.png" />
+<br />
+<img src="images/009.png" />
 
 ## Capacity
 ```go 
