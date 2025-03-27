@@ -10,6 +10,30 @@ Concurrency is about MANAGING multiple task at once, parallelism is about EXECUT
 - Simultaniean executions.
 - Multiple task can be processed simultained, using multiples CPU cores.
 
+# Channels
+- goroutine-safe
+- stores up to  capacity elements, and provides FIFO semantics
+- send values between goroutines
+- can cause them to block, unblock
+
+
+<img src="images/002.png" />
+- affter the first , sendx to 1
+- when the channel is full, sendx to 0 again
+
+<img src="images/003.png" />
+- when you recive a message
+
+
+```go
+// buffered channel
+ch := make(chan Tash, 3)
+
+// unbuffered channel
+ch := make(chan int)
+```
+
+
 ## Capacity
 ```go 
 make(chan *string, 20) // capatiyy of 20
