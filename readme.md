@@ -1,3 +1,32 @@
+# Index
+- [Concurrency](#concurrency)
+- [Parallelism](#parallelism)
+- [Channels](#channels)
+   * [Capacity](#capacity)
+- [Runtime Scheduler](#runtime-scheduler)
+   * [Key Components of Go’s Scheduler](#key-components-of-gos-scheduler)
+      + [How They Work Together](#how-they-work-together)
+      + [2️⃣ ¿Por qué puede haber más M que P?](#2-por-qué-puede-haber-más-m-que-p)
+- [Blocking OS Threads](#blocking-os-threads)
+- [Fork-Join Model](#fork-join-model)
+   * [Fork](#fork)
+   * [Join](#join)
+   * [Pattern](#pattern)
+   * [🔍 Fork-Join Model vs Fork-Join Pool](#-fork-join-model-vs-fork-join-pool)
+- [Communicating Sequential Processes - CSP](#communicating-sequential-processes-csp)
+   * [Synchronization](#synchronization)
+      + [Common synchronization tools:](#common-synchronization-tools)
+   * [Guarded Commands](#guarded-commands)
+- [Pool](#pool)
+   * [What is sync.Pool](#what-is-syncpool)
+- [Single-Thread](#single-thread)
+   * [🔹 Razón principal:](#-razón-principal)
+- [Thread Pool](#thread-pool)
+   * [🚦 ¿Por qué usar un Thread Pool?](#-por-qué-usar-un-thread-pool)
+   * [Golang](#golang)
+      + [🟢 Go usa un modelo M:N (Multiplexing)](#-go-usa-un-modelo-mn-multiplexing)
+
+
 Concurrency is about MANAGING multiple task at once, parallelism is about EXECUTING multiple tasks at once
 
 # Concurrency
