@@ -281,3 +281,27 @@ But here’s the thing, you don’t control how many objects stay in the pool, a
 The good point is, the pool is built to be thread-safe, so multiple goroutines can tap into it simultaneously. Not a big surprise, considering it’s part of the sync package.
 <br />
 https://victoriametrics.com/blog/go-sync-pool/
+
+# Single-Thread
+
+Un modelo single-threaded es más eficiente para operaciones de I/O intensivo porque evita la sobrecarga de manejar múltiples threads del sistema y aprovecha mejor el tiempo de espera de las operaciones de entrada/salida (como leer archivos, consultar bases de datos o hacer peticiones HTTP).
+
+## 🔹 Razón principal:
+Las operaciones de I/O suelen ser bloqueantes, lo que significa que un thread normal quedaría esperando mientras se completa la operación. En un modelo single-threaded con eventos, el programa no se queda bloqueado y puede continuar ejecutando otras tareas mientras espera la respuesta.
+
+# Thread Pool
+Un Thread Pool es un grupo de threads del sistema operativo que están pre-creados y reutilizados para ejecutar múltiples tareas sin necesidad de crear y destruir un thread nuevo cada vez.
+
+## 🚦 ¿Por qué usar un Thread Pool?
+Evita la sobrecarga de crear y destruir threads constantemente.
+
+Permite ejecutar muchas tareas sin consumir demasiada memoria.
+
+Mejora el rendimiento y la escalabilidad en sistemas concurrentes.
+
+## Golang
+Golang no tiene un Thread Pool explícito, pero su modelo de goroutines y el runtime de Go hacen el trabajo automáticamente.
+
+### 🟢 Go usa un modelo M:N (Multiplexing)
+En lugar de asignar un thread del sistema para cada tarea, Go ejecuta miles de goroutines sobre un número limitado de threads.
+🔹 El scheduler de Go maneja la asignación de goroutines a threads del sistema operativo de manera eficiente.
