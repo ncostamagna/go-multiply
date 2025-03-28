@@ -122,6 +122,28 @@ Si un goroutine llama a una función en **C** (usando Cgo):
 
 ➡️ **De nuevo, más M que P.**
 
+# Blocking OS Threads
+Goroutine is blocked as needed, but not the OS thread.
+<br />
+The channel struct stores waiting senders, receivers as well.
+<br />
+<img src="images/010.png" />
+<br />
+<img src="images/011.png" />
+<br />
+<img src="images/012.png" />
+<br />
+<img src="images/013.png" />
+<br />
+<img src="images/014.png" />
+<br />
+<img src="images/015.png" />
+available to recive tasks
+<br />
+<img src="images/016.png" />
+<br />
+<img src="images/017.png" />
+
 # Fork-Join Model
 
 The Fork-Join model is a parallel programming pattern used to break a big task into smaller subtasks that can be done concurrently, and then combined to get the final result.
