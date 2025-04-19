@@ -26,6 +26,8 @@
    * [Golang](#golang)
       + [🟢 Go usa un modelo M:N (Multiplexing)](#-go-usa-un-modelo-mn-multiplexing)
 
+https://www.youtube.com/watch?v=S-MaTH8WpOM&ab_channel=Hypermode
+8:00
 
 Concurrency is about MANAGING multiple task at once, parallelism is about EXECUTING multiple tasks at once
 
@@ -86,6 +88,8 @@ https://www.youtube.com/watch?v=RlM9AfWf1WU&ab_channel=ByteByteGo
 
 # Runtime Scheduler
 The Go runtime manages goroutines using a M:N scheduler, meaning that M goroutines are scheduled onto N OS threads. This allows Go to run a huge number of goroutines efficiently, compared to using OS threads directly.
+
+- Go routines start with just 2kb of memory, but have growable stacks
 
 - M (Goroutines) → N (Threads) → CPU Cores
 Go schedules many goroutines on fewer OS threads, which are mapped to CPU co
@@ -150,6 +154,60 @@ Si un goroutine llama a una función en **C** (usando Cgo):
 2. **Go crea otro M** para seguir ejecutando otros goroutines.
 
 ➡️ **De nuevo, más M que P.**
+
+# Go routines
+
+```go
+type g struct {
+    // The goroutine's stack information (low and high addresses)
+    stack       stack        // Stack bounds
+
+    // Current M (machine / thread) running this G, or nil if not running
+    m           *m           // Associated M executing this goroutine
+
+    // Scheduler-related info: PC/SP to resume execution, goroutine status, etc.
+    sched       gobuf        // Goroutine scheduler state (used when paused)
+
+    // The goroutine's status in an atomic form for safe concurrent access
+    atomicstatus atomic.Uint32  // Atomic access to g.status, for race-free ops
+
+    // Goroutine ID (goid), useful for debugging
+    goid        int64        // Unique ID assigned to this goroutine
+
+    // Entry point function for the goroutine
+    startpc     uintptr      // PC where goroutine starts (used for tracing/debugging)
+
+    // Parameter passed to the goroutine function (e.g., in go func(x))
+    param       unsafe.Pointer  // Function argument
+
+    // If the goroutine is panicking, this points to the panic structure
+    panic       *panic       // Active panic state, if any
+
+    // Linked list of deferred function calls (used by `defer`)
+    _defer      *_defer      // Deferred calls list
+
+    // If the goroutine is blocked on a channel, this points to it
+    parkingOnChan *hchan     // Channel goroutine is parking on (e.g., <-ch)
+
+    // If non-nil, indicates this G is active in the select case for stacks
+    activeStackChans bool    // Used by stack scanning & channel logic
+
+    // Status of the goroutine (Grunnable, Grunning, Gwaiting, etc.)
+    status      uint32       // Goroutine status (non-atomic, use atomicstatus)
+
+    // ... Other fields omitted for brevity
+}
+```
+
+## Goroutine stack
+
+- All goroutines are initially allocated 2kb of memory
+
+- Each go function has a small preamble, wich calls **morestack** if it runs out of memory
+
+- Then, the runtime allocates a **new memory segment** with **doble the size**, and copies over the old segment and restarts execution (and free the old memory)
+
+- Effectively, makes goroutines **infinitely growable**! with efficient shrinking
 
 # Blocking OS Threads
 Goroutine is blocked as needed, but not the OS thread.
